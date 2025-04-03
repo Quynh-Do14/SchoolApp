@@ -5,114 +5,64 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import BottomMenu from './src/infrastructure/common/layouts/bottom-menu';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import Constants from './src/core/common/constants';
+import { RecoilRoot } from 'recoil';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoginScreen from './src/page/Auth';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const Stack = createNativeStackNavigator();
+const StackNavigator = () => {
+  const [token, setToken] = useState<string>("");
+  const navigate = useNavigation<any>();
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+  const getTokenStoraged = async () => {
+    const token = await AsyncStorage.getItem("token").then(result => {
+      if (result) {
+        setToken(result)
+      }
+    });
+    return token;
+  };
+  useEffect(() => {
+    getTokenStoraged().then(() => { })
+  }, [])
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  // useEffect(() => {
+  //   if (token) {
+  //     navigate.navigate(Constants.Navigator.Navbar.value)
+  //   }
+  //   else {
+  //     navigate.navigate(Constants.Navigator.Auth.LoginScreen.value)
+  //   }
+  // }, [token])
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+    <Stack.Navigator
+      initialRouteName={Constants.Navigator.Auth.LoginScreen.value}
+      screenOptions={{ headerShown: false }}
+    >
+      <Stack.Screen
+        name={"BottomMenu"}
+        component={BottomMenu}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name={Constants.Navigator.Auth.LoginScreen.value} component={LoginScreen} />
+    </Stack.Navigator>
   );
-}
+};
+
 
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <RecoilRoot>
+      <NavigationContainer>
+        <StackNavigator />
+      </NavigationContainer>
+    </RecoilRoot>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
