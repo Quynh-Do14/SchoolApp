@@ -35,34 +35,34 @@ const LoginScreen = () => {
         return allRequestOK;
     };
     const onLoginAsync = async () => {
-        // await setSubmittedTime(Date.now());
-        // if (isValidData()) {
-        try {
-            await authService.login(
-                // {
-                //     username: dataProfile.username,
-                //     password: dataProfile.password,
-                // },
-                {
-                    username: "2025792271",
-                    password: "12345678",
-                },
-                setLoading,
-            ).then((response) => {
-                if (response) {
-                    setDataProfile(
-                        {
-                            username: "",
-                            password: "",
-                        },
-                    )
-                    navigation.replace('DrawerMenu');
-                }
-            });
-        } catch (error) {
-            console.error(error);
+        await setSubmittedTime(Date.now());
+        if (isValidData()) {
+            try {
+                await authService.login(
+                    {
+                        username: dataProfile.username,
+                        password: dataProfile.password,
+                    },
+                    // {
+                    //     username: "2025792271",
+                    //     password: "12345678",
+                    // },
+                    setLoading,
+                ).then((response) => {
+                    if (response) {
+                        setDataProfile(
+                            {
+                                username: "",
+                                password: "",
+                            },
+                        )
+                        navigation.replace('DrawerMenu');
+                    }
+                });
+            } catch (error) {
+                console.error(error);
+            }
         }
-        // }
     }
 
     return (
