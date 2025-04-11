@@ -6,8 +6,8 @@ class TimeTableService {
         setLoading(true)
         try {
             return await RequestService.
-                get(Endpoint.TimeTable.timeTable,
-                    { ...params }
+                get(Endpoint.Schedule.GetById,
+                    params
                 ).then(response => {
                     return response;
                 });

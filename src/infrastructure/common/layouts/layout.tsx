@@ -1,25 +1,22 @@
 import { useRecoilState } from 'recoil';
 import React, { useEffect, useState } from 'react';
 import {
-    Dimensions,
     Image,
-    ImageBackground,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View,
-    ScrollView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation } from '@react-navigation/native';
 import authService from '../../repositories/auth/auth.service';
 import { ProfileState } from '../../../core/atoms/profile/profileState';
+import Feather from 'react-native-vector-icons/Feather';
 
-const { width: viewportWidth } = Dimensions.get('window');
-
-const MainLayout = ({ onGoBack, isBackButton = false, title, bgImg, ...props }: any) => {
+const MainLayout = ({ onGoBack, isBackButton = false, title, ...props }: any) => {
     const [token, setToken] = useState<string>('');
     const [dataProfile, setDataProfile] = useRecoilState(ProfileState);
+    const navigation = useNavigation<any>();
 
     const getTokenStoraged = async () => {
         const storedToken = await AsyncStorage.getItem('token');
@@ -36,7 +33,7 @@ const MainLayout = ({ onGoBack, isBackButton = false, title, bgImg, ...props }: 
         if (token) {
             try {
                 const response = await authService.profile(() => { });
-                if (response) {                    
+                if (response) {
                     setDataProfile({ data: response });
                 }
             } catch (error) {
@@ -50,33 +47,48 @@ const MainLayout = ({ onGoBack, isBackButton = false, title, bgImg, ...props }: 
             getProfileUser();
         }
     }, [token]);
-
     return (
         <View style={styles.container}>
-            <ImageBackground
-                source={require('../../../assets/images/bgHeader.png')}
-                style={styles.headerContainer}
-                resizeMode="cover"
-            >
-                <View>
-                    <Text style={styles.greeting}>Good Morning 👋</Text>
-                    <Text style={styles.name}>
-                        {dataProfile?.data?.name || 'Guest'}
-                    </Text>
-                </View>
-                <Image
-                    source={
-                        dataProfile?.data?.image
-                            ? { uri: dataProfile.data.image }
-                            : require('../../../assets/images/myAvatar.png')
-                    }
-                    style={styles.avatar}
-                />
-            </ImageBackground>
+            {/* Header */}
+            <View style={styles.headerContainer}>
+                {isBackButton ?
+                    <Feather
+                        name="arrow-left"
+                        size={24}
+                        color="#fff"
+                        onPress={onGoBack}
+                    />
+                    :
+                    <MaterialCommunityIcons
+                        name="view-grid"
+                        size={24}
+                        color="#fff"
+                        onPress={() => navigation.openDrawer()}
+                    />
+                }
 
-            <ScrollView contentContainerStyle={styles.content}>
-                {props.children}
-            </ScrollView>
+                <View style={styles.textContainer}>
+                    <Text style={styles.name}>
+                        {dataProfile?.data?.fullName}
+                    </Text>
+                    <Text style={styles.class}>{title}</Text>
+                </View>
+
+                <View style={styles.avatarWrapper}>
+                    <Image
+                        source={
+                            dataProfile?.data?.avatar
+                                ? { uri: dataProfile.data.avatar }
+                                : require('../../../assets/images/myAvatar.png')
+                        }
+                        style={styles.avatar}
+                    />
+                    <View style={styles.dot} />
+                </View>
+            </View>
+
+            {/* Content */}
+            {props.children}
         </View>
     );
 };
@@ -86,35 +98,49 @@ export default MainLayout;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-
+        backgroundColor: '#fff',
     },
     headerContainer: {
-        borderBottomRightRadius: 40,
-        borderBottomLeftRadius: 40,
+        backgroundColor: '#4f3f97',
+        borderBottomRightRadius: 30,
+        borderBottomLeftRadius: 30,
         flexDirection: 'row',
         alignItems: 'center',
         padding: 20,
         justifyContent: 'space-between',
     },
-    greeting: {
+    textContainer: {
+        flex: 1,
+        marginLeft: 12,
+    },
+    name: {
         fontSize: 16,
         fontWeight: 'bold',
         color: '#ffffff',
     },
-    name: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#ffffff',
-        marginTop: 4,
+    class: {
+        fontSize: 12,
+        color: '#ddd',
+        marginTop: 2,
+    },
+    avatarWrapper: {
+        position: 'relative',
     },
     avatar: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
         backgroundColor: '#eee',
     },
-    content: {
-        padding: 20,
-        flex: 1
+    dot: {
+        position: 'absolute',
+        top: -2,
+        right: -2,
+        width: 10,
+        height: 10,
+        backgroundColor: 'red',
+        borderRadius: 5,
+        borderWidth: 1.5,
+        borderColor: '#fff',
     },
 });

@@ -1,133 +1,140 @@
-import { Alert, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
-import MainLayout from '../../infrastructure/common/layouts/layout'
+import {
+    Alert,
+    Image,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import React, { useState } from 'react';
+import MainLayout from '../../infrastructure/common/layouts/layout';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import authService from '../../infrastructure/repositories/auth/auth.service';
 import { useRecoilValue } from 'recoil';
 import { ProfileState } from '../../core/atoms/profile/profileState';
-import LoadingFullScreen from '../../infrastructure/common/layouts/components/controls/loading';
 import Constants from '../../core/common/constants';
-
-const { width: viewportWidth } = Dimensions.get('window');
-const { height: viewportHeight } = Dimensions.get('window');
+import LoadingFullScreen from '../../infrastructure/common/components/controls/loading';
+import { configImageURL } from '../../infrastructure/helper/helper';
 
 const ProfileScreen = ({ navigation }: any) => {
     const [loading, setLoading] = useState<boolean>(false);
+    const dataProfile = useRecoilValue(ProfileState).data;
+
     const navigateEditProfile = (value: string) => {
         navigation.navigate(value);
-    }
-
-    const dataProfile = useRecoilValue(ProfileState).data;
+    };
 
     const onLogOutAsync = async () => {
         try {
-            await authService.logout(
-                setLoading
-            ).then(() => {
-                navigation.navigate("LoginScreen")
+            await authService.logout(setLoading).then(() => {
+                navigation.navigate('LoginScreen');
             });
         } catch (error) {
             console.error(error);
         }
-    }
+    };
 
     const onLogOut = () => {
         Alert.alert('Đăng xuất', 'Bạn muốn đăng xuất?', [
-            {
-                text: 'Hủy',
-                style: 'cancel',
-            },
-            {
-                text: 'Đăng xuất', onPress: () => {
-                    onLogOutAsync();
-                },
-            }
+            { text: 'Hủy', style: 'cancel' },
+            { text: 'Đăng xuất', onPress: () => onLogOutAsync() },
         ]);
-    }
+    };
 
     return (
-        <MainLayout title={"Trang cá nhân"}>
+        <MainLayout title={'Trang cá nhân'}>
             <View style={styles.container}>
-                <View style={styles.avatar}>
-                    <Image source={dataProfile.image ? { uri: dataProfile.image } : require("../../assets/images/myAvatar.png")} style={styles.imgAvatar} />
-                    <View>
-                        <Text style={styles.userName}>{dataProfile?.name}</Text>
+                {/* Avatar + tên + email */}
+                <View style={styles.profileBox}>
+                    <Image
+                        source={
+                            dataProfile?.avatar
+                                ? { uri: configImageURL(dataProfile?.avatar) }
+                                :
+                                require('../../assets/images/myAvatar.png')
+                        }
+                        style={styles.avatar}
+                    />
+                    <View style={{ marginLeft: 16 }}>
+                        <Text style={styles.name}>{dataProfile?.fullName}</Text>
                         <Text style={styles.email}>{dataProfile?.email}</Text>
                     </View>
                 </View>
-                <View style={styles.content}>
-                    {
-                        Constants.InfoUser.List.map((it, index) => {
-                            return (
-                                <TouchableOpacity key={index} onPress={() => navigateEditProfile(it.value)} style={styles.touchContent}>
-                                    <Ionicons
-                                        name={it.icon}
-                                        size={12}
-                                        color={"#392AAB"}
-                                    />
 
-                                    <Text style={styles.labelTouch}>{it.label}</Text>
-                                </TouchableOpacity>
-                            )
-                        })
-                    }
-                    <TouchableOpacity onPress={onLogOut} style={styles.touchContent}>
-                        <Ionicons
-                            name={"log-out-outline"}
-                            size={12}
-                            color={"#392AAB"}
-                        />
+                {/* Menu các dòng chọn */}
+                <View style={styles.menuList}>
+                    {Constants.InfoUser.List.map((it, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            onPress={() => navigateEditProfile(it.value)}
+                            style={styles.menuItem}
+                        >
+                            <Ionicons name={it.icon} size={18} color="#4f3f97" />
+                            <Text style={styles.menuLabel}>{it.label}</Text>
+                        </TouchableOpacity>
+                    ))}
 
-                        <Text style={styles.labelTouch}>Đăng xuất</Text>
+                    {/* Đăng xuất */}
+                    <TouchableOpacity onPress={onLogOut} style={[styles.menuItem, styles.logoutItem]}>
+                        <Ionicons name="log-out-outline" size={18} color="#FF4D4D" />
+                        <Text style={[styles.menuLabel, { color: '#FF4D4D' }]}>Đăng xuất</Text>
                     </TouchableOpacity>
-
                 </View>
             </View>
             <LoadingFullScreen loading={loading} />
         </MainLayout>
-    )
-}
+    );
+};
 
-export default ProfileScreen
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    avatar: {
-        flexDirection: "row",
-        gap: 20,
-        alignItems: "center"
+    profileBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 24,
+        paddingHorizontal: 10,
     },
-    imgAvatar: {
+    avatar: {
         width: 80,
         height: 80,
-        borderRadius: 50
+        borderRadius: 40,
+        borderWidth: 2,
+        borderColor: '#4f3f97',
     },
-    userName: {
+    name: {
         fontSize: 16,
-        color: "#121212",
+        fontWeight: 'bold',
+        color: '#121212',
     },
     email: {
-        fontSize: 12,
-        color: "#121212",
+        fontSize: 13,
+        color: '#666',
+        marginTop: 4,
     },
-    content: {
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between"
+    menuList: {
+        marginTop: 16,
+        paddingHorizontal: 10,
     },
-    touchContent: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 16,
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 14,
         borderBottomWidth: 1,
-        borderColor: "#392AAB",
-        paddingVertical: 16,
+        borderColor: '#ececec',
     },
-    labelTouch: {
-        fontSize: 14,
-        color: "#392AAB",
-        fontWeight: "bold",
+    menuLabel: {
+        marginLeft: 14,
+        fontSize: 15,
+        color: '#4f3f97',
+        fontWeight: '600',
     },
-})
+    logoutItem: {
+        borderTopWidth: 1,
+        borderColor: '#ccc',
+        marginTop: 24,
+    },
+});

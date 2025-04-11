@@ -1,7 +1,6 @@
 import moment from "moment";
-import { any } from "prop-types";
 import Constants from "../../core/common/constants";
-
+const baseURL = "http://192.168.100.79:8080/api";
 export const validateFields = (isImplicitChange: boolean, key: any, isCheck: boolean, setError: Function, error: any, message: string) => {
     if (isImplicitChange) {
         error[key] = {
@@ -37,9 +36,12 @@ export const convertDate = (date: any) => {
     } return null;
 
 };
-export const convertDateOnly = (date: any) => {
+export const convertDateOnly = (date: any, reverse?: boolean) => {
     if (date) {
         let dateFormat = new Date(date);
+        if (reverse) {
+            return moment(dateFormat).format("YYYY-MM-DD");
+        }
         return moment(dateFormat).format("DD/MM/YYYY");
     } return null;
 };
@@ -159,4 +161,70 @@ export const genderConfig = (gender: string) => {
 export const formatCurrencyVND = (amount: string) => {
     let formattedAmount = amount.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     return `${formattedAmount} ₫`;
+}
+
+export const configImageURL = (image: string) => {
+    if (image) {
+        return `${baseURL}/images/uploads/avatars/${image}`;
+    }
+    return ""
+}
+export const configImageURLIncludeHTTP = (image: string) => {
+    if (image.includes("http")) {
+        return image;
+    }
+    if (image) {
+        return `${baseURL}/uploads/${image}`;
+    }
+    return ""
+}
+
+export function getStartAndEndOfWeek(date = new Date()) {
+    // Clone ngày truyền vào để không thay đổi gốc
+    const currentDate = new Date(date);
+
+    // Lấy ngày trong tuần (0: Chủ Nhật, 1: Thứ Hai, ..., 6: Thứ Bảy)
+    const day = currentDate.getDay();
+
+    // Tính toán offset để tìm Thứ Hai (đầu tuần)
+    const diffToMonday = (day === 0 ? -6 : 1) - day;
+
+    // Tạo ngày đầu tuần (Thứ Hai)
+    const startOfWeek = new Date(currentDate);
+    startOfWeek.setDate(currentDate.getDate() + diffToMonday);
+
+    // Tạo ngày cuối tuần (Chủ Nhật)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    return {
+        startOfWeek,
+        endOfWeek
+    };
+}
+export function getVietnameseDayOfWeek(dayNumber: number): string {
+    const days = [
+        "Thứ hai",
+        "Thứ ba",
+        "Thứ tư",
+        "Thứ năm",
+        "Thứ sáu",
+        "Thứ bảy",
+        "Chủ nhật",
+    ];
+    const result = String(days[dayNumber - 1])
+    return result || "Không hợp lệ";
+}
+export function translateDayToVietnamese(day: string) {
+    const days = {
+        MONDAY: "Thứ hai",
+        TUESDAY: "Thứ ba",
+        WEDNESDAY: "Thứ tư",
+        THURSDAY: "Thứ năm",
+        FRIDAY: "Thứ sáu",
+        SATURDAY: "Thứ bảy",
+        SUNDAY: "Chủ nhật"
+    };
+    const result = days[day.toUpperCase()]
+    return result || "Không hợp lệ";
 }

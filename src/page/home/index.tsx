@@ -8,60 +8,63 @@ import {
     TouchableOpacity,
     Dimensions,
 } from 'react-native';
+import MainLayout from '../../infrastructure/common/layouts/layout';
 
 const screenWidth = Dimensions.get('window').width;
 
 const MENU_ITEMS = [
-    { label: 'Dashboard', icon: require('./assets/icons/dashboard.png') },
-    { label: 'Homework', icon: require('./assets/icons/homework.png') },
-    { label: 'Attendance', icon: require('./assets/icons/attendance.png') },
-    { label: 'Fee Details', icon: require('./assets/icons/fee.png') },
-    { label: 'Examination', icon: require('./assets/icons/exam.png') },
-    { label: 'Report Cards', icon: require('./assets/icons/report.png') },
-    { label: 'Calendar', icon: require('./assets/icons/calendar.png') },
-    { label: 'Notice Board', icon: require('./assets/icons/notice.png') },
-    { label: 'Multimedia', icon: require('./assets/icons/multimedia.png') },
-    { label: 'Academic Year', icon: require('./assets/icons/academic.png') },
-    { label: 'Profile', icon: require('./assets/icons/profile.png') },
+    { label: 'Dashboard', icon: '' },
+    { label: 'Homework', icon: '' },
+    { label: 'Attendance', icon: '' },
+    { label: 'Fee Details', icon: '' },
+    { label: 'Examination', icon: '' },
+    { label: 'Report Cards', icon: '' },
+    { label: 'Calendar', icon: '' },
+    { label: 'Notice Board', icon: '' },
+    { label: 'Multimedia', icon: '' },
+    { label: 'Academic Year', icon: '' },
+    { label: 'Profile', icon: '' },
 ];
 
 const HomeScreen = () => {
     return (
-        <View style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <Image
-                    source={{ uri: 'https://randomuser.me/api/portraits/women/44.jpg' }}
-                    style={styles.avatar}
-                />
-                <View style={styles.headerInfo}>
-                    <Text style={styles.name}>Yogita Shaje</Text>
-                    <Text style={styles.class}>Class VII B</Text>
+        <MainLayout title={"Trang cá nhân"}>
+            <View style={styles.container}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <Image
+                        source={{ uri: 'https://randomuser.me/api/portraits/women/44.jpg' }}
+                        style={styles.avatar}
+                    />
+                    <View style={styles.headerInfo}>
+                        <Text style={styles.name}>Yogita Shaje</Text>
+                        <Text style={styles.class}>Class VII B</Text>
+                    </View>
+                    <TouchableOpacity style={styles.closeButton}>
+                        <Text style={{ fontSize: 24, color: '#fff' }}>✕</Text>
+                    </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.closeButton}>
-                    <Text style={{ fontSize: 24, color: '#fff' }}>✕</Text>
+
+                {/* Menu */}
+                <FlatList
+                    data={MENU_ITEMS}
+                    numColumns={3}
+                    keyExtractor={(item, index) => index.toString()}
+                    contentContainerStyle={styles.menuGrid}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity style={styles.menuItem}>
+                            {/* <Image source={item.icon} style={styles.menuIcon} /> */}
+                            <Text style={styles.menuLabel}>{item.label}</Text>
+                        </TouchableOpacity>
+                    )}
+                />
+
+                {/* Logout */}
+                <TouchableOpacity style={styles.logout}>
+                    <Text style={styles.logoutText}>Logout</Text>
                 </TouchableOpacity>
             </View>
-
-            {/* Menu */}
-            <FlatList
-                data={MENU_ITEMS}
-                numColumns={3}
-                keyExtractor={(item, index) => index.toString()}
-                contentContainerStyle={styles.menuGrid}
-                renderItem={({ item }) => (
-                    <TouchableOpacity style={styles.menuItem}>
-                        <Image source={item.icon} style={styles.menuIcon} />
-                        <Text style={styles.menuLabel}>{item.label}</Text>
-                    </TouchableOpacity>
-                )}
-            />
-
-            {/* Logout */}
-            <TouchableOpacity style={styles.logout}>
-                <Text style={styles.logoutText}>Logout</Text>
-            </TouchableOpacity>
-        </View>
+        </MainLayout>
     );
 };
 

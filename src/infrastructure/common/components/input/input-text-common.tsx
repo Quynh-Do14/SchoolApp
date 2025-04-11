@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { TextInput, View, Text, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { MessageError } from '../controls/MessageError';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { validateCMND, validateEmail, validatePhoneNumber } from '../../../../helper/validate';
-import { validateFields } from '../../../../helper/helper';
+import { validateFields } from '../../../helper/helper';
+import { validateCMND, validateEmail, validatePhoneNumber } from '../../../helper/validate';
 
 type Props = {
     label: string,

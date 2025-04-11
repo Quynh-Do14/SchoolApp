@@ -7,51 +7,58 @@
 
 import React, { useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import BottomMenu from './src/infrastructure/common/layouts/bottom-menu';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import Constants from './src/core/common/constants';
 import { RecoilRoot } from 'recoil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginScreen from './src/page/Auth';
+import DrawerMenu from './src/infrastructure/common/layouts/drawer-menu';
+import EditProfile from './src/page/profile/components/editProfile';
+import ForgotPasswordScreen from './src/page/Auth/forgotPassword';
+import ResetPasswordScreen from './src/page/Auth/resetPassword';
 
 const Stack = createNativeStackNavigator();
 const StackNavigator = () => {
-  const [token, setToken] = useState<string>("");
-  const navigate = useNavigation<any>();
+  const [initialRoute, setInitialRoute] = useState<string>("");
+  const [isLogin, setIsLogin] = useState<boolean>(false);
 
-  const getTokenStoraged = async () => {
-    const token = await AsyncStorage.getItem("token").then(result => {
-      if (result) {
-        setToken(result)
+  const checkToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token").then(result => {
+        return result
+      });
+      setIsLogin(!!token);
+      if (token || token !== null) {
+        setInitialRoute('DrawerMenu');
+      } else {
+        setInitialRoute('LoginScreen');
       }
-    });
-    return token;
+    } catch (error) {
+      setInitialRoute('LoginScreen');
+    }
   };
-  useEffect(() => {
-    getTokenStoraged().then(() => { })
-  }, [])
 
-  // useEffect(() => {
-  //   if (token) {
-  //     navigate.navigate(Constants.Navigator.Navbar.value)
-  //   }
-  //   else {
-  //     navigate.navigate(Constants.Navigator.Auth.LoginScreen.value)
-  //   }
-  // }, [token])
+  useEffect(() => {
+    checkToken();
+  }, []);
+  // if (initialRoute) {
   return (
     <Stack.Navigator
-      initialRouteName={Constants.Navigator.Auth.LoginScreen.value}
+      initialRouteName={"LoginScreen"}
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen
-        name={"BottomMenu"}
-        component={BottomMenu}
+        name={"DrawerMenu"}
+        component={DrawerMenu}
         options={{ headerShown: false }}
       />
       <Stack.Screen name={Constants.Navigator.Auth.LoginScreen.value} component={LoginScreen} />
+      <Stack.Screen name={"EditProfile"} component={EditProfile} />
+      <Stack.Screen name={"ForgotPasswordScreen"} component={ForgotPasswordScreen} />
+      <Stack.Screen name={"ResetPasswordScreen"} component={ResetPasswordScreen} />
     </Stack.Navigator>
   );
+  // }
 };
 
 

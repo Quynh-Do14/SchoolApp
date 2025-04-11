@@ -1,74 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet, ScrollView } from 'react-native';
-import { Card, Checkbox } from 'react-native-paper';
 import scheduleService from '../../infrastructure/repositories/schedule/schedule.service';
-import LoadingFullScreen from '../../infrastructure/common/layouts/components/controls/loading';
 import MainLayout from '../../infrastructure/common/layouts/layout';
-import ButtonCommon from '../../infrastructure/common/layouts/components/button/button-common';
-import registationService from '../../infrastructure/repositories/registation/registation.service';
+import registationService from '../../infrastructure/repositories/enrollment/enrollment.service';
 import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
-const noticeBoard = [
-  {
-    title: 'School is going for vacation in next month',
-    date: '02 March 2020',
-  },
-  {
-    title: 'Summer Book Fair at School Campus in June',
-    date: '02 March 2020',
-  },
-  {
-    title: 'School going for vacation next month',
-    date: '02 March 2020',
-  },
-];
-
-const homeworkList = [
-  {
-    id: '1',
-    subject: 'English',
-    date: 'Today',
-    task: 'Learn Chapter 5 with one Essay',
-    done: false,
-  },
-  {
-    id: '2',
-    subject: 'Maths',
-    date: 'Today',
-    task: 'Exercise Trigonometry 1st topic',
-    done: true,
-  },
-  {
-    id: '3',
-    subject: 'Hindi',
-    date: 'Yesterday',
-    task: 'Hindi writing 3 pages',
-    done: false,
-  },
-  {
-    id: '4',
-    subject: 'Social Science',
-    date: 'Yesterday',
-    task: 'Test for History first session',
-    done: false,
-  },
-  {
-    id: '5',
-    subject: 'Science',
-    date: '16 March 2020',
-    task: 'Learn Atoms Physics',
-    done: true,
-  },
-  {
-    id: '6',
-    subject: 'English',
-    date: '16 March 2020',
-    task: 'English writing 3 pages',
-    done: false,
-  },
-];
-
+import LoadingFullScreen from '../../infrastructure/common/components/controls/loading';
+import ButtonCommon from '../../infrastructure/common/components/button/button-common';
+import { convertDateOnly, translateDayToVietnamese } from '../../infrastructure/helper/helper';
+import { useIsFocused } from '@react-navigation/native';
 
 const DangKyMonHoc = () => {
   const [selectedCourses, setSelectedCourses] = useState<string>("");
@@ -82,15 +22,11 @@ const DangKyMonHoc = () => {
   const getAllScheduleAsync = async () => {
     try {
       await scheduleService.getSchedule(
-        {
-          semester: "",
-          academic_year: "",
-          teacher: ""
-        },
+        {},
         setLoading,
       ).then((response) => {
         if (response) {
-          setCourses(response.schedules)
+          setCourses(response)
         }
       });
     } catch (error) {
@@ -104,9 +40,9 @@ const DangKyMonHoc = () => {
 
   const handleDangKy = async () => {
     try {
-      await registationService.createRegistration(
+      await registationService.createEnrollment(
         {
-          schedule_id: selectedCourses
+          classId: selectedCourses
         },
         setLoading,
       ).then(() => {
@@ -117,34 +53,41 @@ const DangKyMonHoc = () => {
     }
   };
 
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    if (isFocused) {
+      getAllScheduleAsync().then(() => { });
+    }
+  }, [isFocused]);
+
   return (
     <MainLayout title={'Đăng Ký Môn Học'}>
-      <ScrollView>
-        <Text style={styles.sectionTitle}>Notice Board</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {noticeBoard.map((item, index) => (
-            <View key={index} style={styles.noticeCard}>
-              <Text style={styles.noticeText}>{item.title}</Text>
-              <Text style={styles.noticeDate}>{item.date}</Text>
-            </View>
+      <View style={styles.container}>
+        <ScrollView>
+          {courses.map((item, index) => (
+            <TouchableOpacity onPress={() => toggleCourse(item.courseClassId)} key={index} style={styles.homeworkItem}>
+              <View style={selectedCourses == item.courseClassId ? styles.checkDone : styles.checkBox}>
+                {selectedCourses == item.id && <Icon name="check" size={16} color="#fff" />}
+              </View>
+              <View style={styles.homeworkContent}>
+                <Text style={styles.homeworkText}>{item.courseName}</Text>
+                <Text style={styles.homeworkMeta}>Phòng: {item.room} /</Text>
+                <Text style={styles.homeworkMeta}>Giáo viên: {item.fullName}</Text>
+                <Text style={styles.homeworkMeta}>Thời gian: {convertDateOnly(item.date)} - {convertDateOnly(item.endDate)}</Text>
+                <Text style={styles.homeworkMeta}>Lịch học:</Text>
+                {
+                  item?.dayNames?.map((day: string, dayIndex: number) => (
+                    <Text style={styles.homeworkMeta} key={dayIndex}>{translateDayToVietnamese(day)} {"=>"} {item.startTime} - {item.endTime}</Text>
+                  ))
+                }
+              </View>
+            </TouchableOpacity>
           ))}
         </ScrollView>
-
-        <Text style={styles.sectionTitle}>Homework</Text>
-        {homeworkList.map((item) => (
-          <View key={item.id} style={styles.homeworkItem}>
-            <TouchableOpacity style={item.done ? styles.checkDone : styles.checkBox}>
-              {item.done && <Icon name="check" size={16} color="#fff" />}
-            </TouchableOpacity>
-            <View style={styles.homeworkContent}>
-              <Text style={styles.homeworkText}>{item.task}</Text>
-              <Text style={styles.homeworkMeta}>
-                {item.subject} / {item.date}
-              </Text>
-            </View>
-          </View>
-        ))}
-      </ScrollView>
+        <ButtonCommon
+          title={'Đăng kí'}
+          onPress={handleDangKy} />
+      </View>
       <LoadingFullScreen loading={loading} />
     </MainLayout>
 
@@ -152,6 +95,13 @@ const DangKyMonHoc = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: "column",
+    gap: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',

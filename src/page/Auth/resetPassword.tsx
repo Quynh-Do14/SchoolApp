@@ -7,7 +7,8 @@ import InputPasswordCommon from '../../infrastructure/common/components/input/in
 import ButtonCommon from '../../infrastructure/common/components/button/button-common';
 import LoadingFullScreen from '../../infrastructure/common/components/controls/loading';
 import React from 'react';
-const LoginScreen = () => {
+
+const ResetPasswordScreen = () => {
     const [_data, _setData] = useState<any>({});
     const [validate, setValidate] = useState<any>({});
     const [submittedTime, setSubmittedTime] = useState<any>(null);
@@ -35,34 +36,28 @@ const LoginScreen = () => {
         return allRequestOK;
     };
     const onLoginAsync = async () => {
-        // await setSubmittedTime(Date.now());
-        // if (isValidData()) {
-        try {
-            await authService.login(
-                // {
-                //     username: dataProfile.username,
-                //     password: dataProfile.password,
-                // },
-                {
-                    username: "2025792271",
-                    password: "12345678",
-                },
-                setLoading,
-            ).then((response) => {
-                if (response) {
-                    setDataProfile(
-                        {
-                            username: "",
-                            password: "",
-                        },
-                    )
-                    navigation.replace('DrawerMenu');
-                }
-            });
-        } catch (error) {
-            console.error(error);
+        await setSubmittedTime(Date.now());
+        if (isValidData()) {
+            try {
+                await authService.resetPassword(
+                    dataProfile.otp,
+                    dataProfile.newPassword,
+                    setLoading,
+                ).then((response) => {
+                    if (response) {
+                        setDataProfile(
+                            {
+                                otp: "",
+                                newPassword: "",
+                            },
+                        )
+                        navigation.replace('LoginScreen');
+                    }
+                });
+            } catch (error) {
+                console.error(error);
+            }
         }
-        // }
     }
 
     return (
@@ -106,9 +101,9 @@ const LoginScreen = () => {
                         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                             <View style={styles.form}>
                                 <InputTextCommon
-                                    label={"Tên đăng nhập"}
-                                    attribute={"username"}
-                                    dataAttribute={dataProfile.username}
+                                    label={"Mã OTP"}
+                                    attribute={"otp"}
+                                    dataAttribute={dataProfile.otp}
                                     isRequired={false}
                                     setData={setDataProfile}
                                     editable={true}
@@ -118,8 +113,8 @@ const LoginScreen = () => {
                                 />
                                 <InputPasswordCommon
                                     label={"Mật khẩu"}
-                                    attribute={"password"}
-                                    dataAttribute={dataProfile.password}
+                                    attribute={"newPassword"}
+                                    dataAttribute={dataProfile.newPassword}
                                     isRequired={false}
                                     setData={setDataProfile}
                                     validate={validate}
@@ -127,19 +122,12 @@ const LoginScreen = () => {
                                     submittedTime={submittedTime}
                                 />
                                 {/* Remember Me and Forgot Password */}
-                                <ButtonCommon title="Đăng Nhập" onPress={onLoginAsync} />
+                                <ButtonCommon title="Đặt lại" onPress={onLoginAsync} />
                                 <View style={styles.row}>
                                     <TouchableOpacity
-                                        onPress={() => navigation.navigate("ForgotPasswordScreen")}
+                                        onPress={() => navigation.goBack()}
                                     >
-                                        <Text style={styles.forgotPassword}>Quên mật khẩu</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={styles.row}>
-                                    <TouchableOpacity
-                                        onPress={() => navigation.navigate("ResetPasswordScreen")}
-                                    >
-                                        <Text style={styles.forgotPassword}>Đặt lại mật khẩu</Text>
+                                        <Text style={styles.forgotPassword}>Quay lại</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -152,7 +140,7 @@ const LoginScreen = () => {
     )
 }
 
-export default LoginScreen
+export default ResetPasswordScreen
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#F8F9FA',
@@ -179,7 +167,7 @@ const styles = StyleSheet.create({
     },
     form: {
         flexDirection: "column",
-        gap: 8
+        gap: 12
     },
     input: {
         height: 50,

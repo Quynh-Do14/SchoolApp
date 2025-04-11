@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { TextInput, View, Text, StyleSheet, Pressable, KeyboardAvoidingView } from 'react-native';
 import { MessageError } from '../controls/MessageError';
-import { validateFields } from '../../../../helper/helper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { validateFields } from '../../../helper/helper';
 type Props = {
     label: string,
     attribute: string,

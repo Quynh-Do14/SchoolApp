@@ -43,8 +43,8 @@ export default class Constants {
         static BookingScreen = class {
             static value = "BookingScreen"
         }
-        static PracticeScreen = class {
-            static value = "PracticeScreen"
+        static ExamScreen = class {
+            static value = "ExamScreen"
         }
         static Navbar = class {
             static value = "Navbar"
@@ -91,26 +91,11 @@ export default class Constants {
                 label: "Thông tin",
                 icon: "settings-sharp"
             },
-            {
-                value: "ChangePasswordScreen",
-                label: "Đổi mật khẩu",
-                icon: "keypad",
-            },
             // {
             //     value: "ChangePasswordScreen",
-            //     label: "Thông báo",
-            //     icon: "notifications",
+            //     label: "Đổi mật khẩu",
+            //     icon: "keypad",
             // },
-            {
-                value: "SearchScreen",
-                label: "Môn học",
-                icon: "bar-chart-sharp"
-            },
-            // {
-            //     value: "",
-            //     label: "Tin tức",
-            //     icon: "newspaper-sharp"
-            // }
         ]
     }
     static Gender = class {

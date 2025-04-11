@@ -1,35 +1,40 @@
-
-import homeIcon from "../../assets/images/home.png";
-import homeActiveIcon from "../../assets/images/homeActive.png";
-import cartIcon from "../../assets/images/cart.png";
-import cartActiveIcon from "../../assets/images/cartActive.png";
-
-import Constants from "./constants";
-import DangKyMonHoc from "../../page/dangki";
-import ThoiKhoaBieu from "../../page/tkb";
-import ProfileScreen from "../../page/profile";
-
-export const publishNavigator = [
-
-]
+import CourseClassScreen from '../../page/courseClass';
+import DangKyMonHoc from '../../page/dangki';
+import ExamScreen from '../../page/exam';
+import GradeScreen from '../../page/grade';
+import ProfileScreen from '../../page/profile';
+import ThoiKhoaBieu from '../../page/tkb';
+import Constants from './constants';
 
 export const bottomNavigator = [
     {
         component: DangKyMonHoc,
-        name: Constants.Navigator.HomeScreen.value,
-        unFocused: homeIcon,
-        focused: homeActiveIcon
+        name: "Đăng kí môn học",
+        icon: 'book-open-variant', // Đăng ký môn học
+    },
+    {
+        component: CourseClassScreen,
+        name: "Môn học đã đăng kí",
+        icon: 'calendar-clock', // Lịch học
     },
     {
         component: ThoiKhoaBieu,
-        name: Constants.Navigator.BookingScreen.value,
-        unFocused: cartIcon,
-        focused: cartActiveIcon
+        name: "Thời Khóa Biểu",
+        icon: 'clock-time-nine-outline', // Lịch học
+    },
+    {
+        component: ExamScreen,
+        name: "Lịch thi", // nên fix lại name tránh trùng
+        icon: 'clipboard-text-outline', // Lịch thi
+    },
+    {
+        component: GradeScreen,
+        name: "Xem điểm", // nên fix lại name tránh trùng
+        icon: 'book-edit-outline', // Lịch thi
     },
     {
         component: ProfileScreen,
-        name: Constants.Navigator.InfoUserScreen.value,
-        unFocused: cartIcon,
-        focused: cartActiveIcon
+        name: "Hồ sơ",
+        icon: 'account-circle-outline', // Thông tin cá nhân
     },
-]
+];
